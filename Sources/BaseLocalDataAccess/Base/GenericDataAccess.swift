@@ -38,7 +38,7 @@ open class GenericDataAccess<TEntity>: GenericDataAccessProtocol where TEntity: 
         throw EntityCRUDError.failNewEntity(entityName)
     }
     
-    public func saveEntity(_ entity: TEntity) throws{
+    public func saveEntity() throws{
         
         do{
             try managedObjectContext.performAndWait {
