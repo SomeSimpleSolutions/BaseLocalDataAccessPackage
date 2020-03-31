@@ -148,7 +148,7 @@ It is also possible to have compound predicates:
   predicateCompound.appendPredicate(predicateObject2)
 ```
 
-##Installation
+## Installation
 Add BaseLocalDataAccessPackage to your Package.swift.
 
 ```swift 
