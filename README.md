@@ -1,8 +1,10 @@
 # BaseLocalDataAccessPackage
 
+BaseLocalDataAccessPackage is a wrapper around Core Data that allows writing code to fetch and manipulate data simpler.
+
 ## Usage
 
-Adopt the Enitites to `EntityProtocol`. 
+Adopt the Entities to `EntityProtocol`. 
 
 ```swift
 import CoreData
@@ -77,7 +79,7 @@ public final class ContextHelper {
 
 Set the context in the `AppDelegate`.
 
-Now it’s time to use the library to fetch, save, edit and delete.
+Now it’s time to use the library to fetch, save, edit, and delete.
 Prepare the data access class.
 
 ```swift 
@@ -145,3 +147,19 @@ It is also possible to have compound predicates:
   predicateCompound.appendPredicate(predicateObject1)
   predicateCompound.appendPredicate(predicateObject2)
 ```
+
+##Installation
+Add BaseLocalDataAccessPackage to your Package.swift.
+
+```swift 
+import PackageDescription
+
+let package = Package(
+    name: [your project name],
+    dependencies: [
+        .Package(url: "https://github.com/SomeSimpleSolutions/BaseLocalDataAccessPackage.git", from: "1.0.0")
+    ]
+)
+```
+
+
