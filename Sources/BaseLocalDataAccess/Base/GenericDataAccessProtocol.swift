@@ -18,3 +18,4 @@ public protocol GenericDataAccessProtocol {
     func fetchEntityCount(predicate: PredicateProtocol?) throws -> Int
     func deleteEntity(_ entity: T) throws
 }
+
