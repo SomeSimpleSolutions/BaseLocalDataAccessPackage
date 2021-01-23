@@ -1,5 +1,5 @@
 //
-//  GenericDataAccessPublishersTests.swift
+//  SaveEntityPublisherTests.swift
 //  
 //
 //  Created by Hadi Zamani on 1/17/21.
@@ -11,7 +11,7 @@ import CoreData
 @testable import BaseLocalDataAccess
 
 @available(iOS 13.0, *)
-class GenericDataAccessPublishersTests: XCTestCase {
+class SaveEntityPublisherTests: XCTestCase {
     private var storage = Set<AnyCancellable>()
     private var genericDataAccess: MockGenericDataAccess<MockEntity>!
     
