@@ -61,7 +61,7 @@ class CreateNewInstancePublisherTests: XCTestCase {
         }.store(in:&self.storage)
     }
 
-    func testSaveEntityThrowsGeneralError() {
+    func testCreateNewInstanceThrowsGeneralError() {
         enum MockError: Error {
             case general(String)
         }

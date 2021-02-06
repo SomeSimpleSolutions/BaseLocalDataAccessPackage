@@ -17,6 +17,7 @@ class MockManagedObjectContext: ManagedObjectContextProtocol {
 }
 
 class MockEntity {
+    var id: String = ""
 }
 
 extension MockEntity: EntityProtocol {
