@@ -76,7 +76,7 @@ open class GenericDataAccess<TEntity>: GenericDataAccessProtocol where TEntity: 
         
     }
     
-    public func fetchEntityCount(predicate: PredicateProtocol? = nil) throws -> Int{
+    public func fetchEntityCount(predicate: PredicateProtocol? = nil) throws -> Int {
         
         let entityName = getName()
         
