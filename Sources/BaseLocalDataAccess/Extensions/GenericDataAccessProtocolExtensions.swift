@@ -8,7 +8,7 @@
 
 import Foundation
 
-public extension GenericDataAccessProtocol where T: EntityProtocol{
+public extension GenericDataAccessProtocol where T: EntityProtocol {
     
     func generateId() -> String{
         return UUID().uuidString

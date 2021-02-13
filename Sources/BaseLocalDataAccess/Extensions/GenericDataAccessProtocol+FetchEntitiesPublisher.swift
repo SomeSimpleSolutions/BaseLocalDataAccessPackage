@@ -1,8 +1,8 @@
 //
-//  GenericDataAccess+FetchEntityPublisher.swift
+//  GenericDataAccessProtocol+FetchEntitiesPublisher.swift
 //  
 //
-//  Created by Hadi Zamani on 1/23/21.
+//  Created by Hadi Zamani on 2/9/21.
 //
 
 import Combine
@@ -10,16 +10,14 @@ import Combine
 @available(iOS 13.0, *)
 public extension GenericDataAccess {
 
-    typealias Params = (predicate: PredicateProtocol?, sort: SortProtocol?, fetchLimit: Int?, fetchOffset: Int?)
-
-    func fetchEntityPublisher(predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) -> FetchEntityPublisher {
+    func fetchEntitiesPublisher(predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) -> FetchEntitiesPublisher {
 
         let params: Params = (predicate: predicate, sort: sort, fetchLimit: fetchLimit, fetchOffset: fetchOffset)
 
-        return FetchEntityPublisher(self: self, params: params)
+        return FetchEntitiesPublisher(self: self, params: params)
     }
 
-    struct FetchEntityPublisher: Publisher {
+    struct FetchEntitiesPublisher: Publisher {
         private let gda: GenericDataAccess<TEntity>
         private let params: Params
 
@@ -55,7 +53,7 @@ public extension GenericDataAccess {
                 }
 
                 do {
-                    let result = try gda.fetchEntity(predicate: params.predicate, sort: params.sort, fetchLimit: params.fetchLimit, fetchOffset: params.fetchOffset)
+                    let result = try gda.fetchEntities(predicate: params.predicate, sort: params.sort, fetchLimit: params.fetchLimit, fetchOffset: params.fetchOffset)
                     _ = downstream?.receive(result)
                     downstream?.receive(completion: .finished)
 
@@ -72,3 +70,4 @@ public extension GenericDataAccess {
         }
     }
 }
+
