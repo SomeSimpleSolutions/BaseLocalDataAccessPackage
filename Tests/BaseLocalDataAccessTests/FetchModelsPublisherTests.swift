@@ -1,8 +1,8 @@
 //
-//  FetchEntitiesPublisherTests.swift
+//  FetchModelsPublisherTests.swift
+//  
 //
-//
-//  Created by Hadi Zamani on 2/9/21.
+//  Created by Hadi Zamani on 2/14/21.
 //
 
 import XCTest
@@ -11,14 +11,17 @@ import CoreData
 @testable import BaseLocalDataAccess
 
 @available(iOS 13.0, *)
-class FetchEntitiesPublisherTests: XCTestCase {
+class FetchModelsPublisherTests: XCTestCase {
     private var storage = Set<AnyCancellable>()
     private var genericDataAccess: MockGenericDataAccess<MockEntity>!
+    private var p: GenericDataAccess<MockEntity>.FetchModelsPublisher<MockModel>!
 
     override func setUp() {
         super.setUp()
 
         genericDataAccess = MockGenericDataAccess<MockEntity>(context: MockManagedObjectContext())
+
+        p = genericDataAccess.fetchModelsPublisher()
     }
 
     override func tearDown() {
@@ -27,8 +30,8 @@ class FetchEntitiesPublisherTests: XCTestCase {
         storage.forEach { $0.cancel() }
     }
 
-    func testFetchEntityIsSuccessful() {
-        genericDataAccess.fetchEntitiesPublisher().sink { completion in
+    func testFetchModelsIsSuccessful() {
+        p.sink { completion in
             switch completion {
             case .finished:
                 break
@@ -40,42 +43,17 @@ class FetchEntitiesPublisherTests: XCTestCase {
         }.store(in:&self.storage)
     }
 
-    func testFetchEntityThrowsFailFetchEntity() {
+    func testFetchModelsThrowsFailCreateModelWhenFetchEntityThrows() {
         genericDataAccess.set {
             throw EntityCRUDError.failFetchEntity("Mock")
         }
 
-        genericDataAccess.fetchEntitiesPublisher().sink { completion in
+        p.sink { completion in
             switch completion {
             case .finished:
                 XCTFail()
             case .failure(let error):
-                if case .failFetchEntity(let s) = error {
-                    XCTAssertEqual("MockEntity", s)
-                } else {
-                    XCTFail()
-                }
-            }
-        } receiveValue: { result in
-            XCTAssertNil(result)
-        }.store(in:&self.storage)
-    }
-
-    func testFetchEntityThrowsGeneralError() {
-        enum MockError: Error {
-            case general(String)
-        }
-
-        genericDataAccess.set {
-            throw MockError.general("General Error")
-        }
-
-        genericDataAccess.fetchEntitiesPublisher().sink { completion in
-            switch completion {
-            case .finished:
-                XCTFail()
-            case .failure(let error):
-                if case .failFetchEntity(let s) = error {
+                if case ModelError.failCreateModel(let s) = error {
                     XCTAssertNotNil(s)
                 } else {
                     XCTFail()
@@ -86,7 +64,27 @@ class FetchEntitiesPublisherTests: XCTestCase {
         }.store(in:&self.storage)
     }
 
-    func testFetchEntityRetuensCorrectResultWhenPassesPredicate() {
+    func testFetchModelsThrowsFailCreateModelWhenToModelThrows() {
+
+        genericDataAccess.setEntity(FailedToModelMockEntity())
+
+        p.sink { completion in
+            switch completion {
+            case .finished:
+                XCTFail()
+            case .failure(let error):
+                if case .failCreateModel(let s) = error {
+                    XCTAssertNotNil(s)
+                } else {
+                    XCTFail()
+                }
+            }
+        } receiveValue: { result in
+            XCTAssertNil(result)
+        }.store(in:&self.storage)
+    }
+
+    func testFetchModelsRetuensCorrectResultWhenPassesPredicate() {
         let p = PredicateObject(fieldName: "Id", operatorName: .equal, value: "1")
 
         genericDataAccess.fetchEntitiesPublisher(predicate: p).sink { completion in
@@ -101,7 +99,7 @@ class FetchEntitiesPublisherTests: XCTestCase {
         }.store(in:&self.storage)
     }
 
-    func testFetchEntityRetuensCorrectResultWhenPassesSort() {
+    func testFetchModelsRetuensCorrectResultWhenPassesSort() {
         let s = SortObject(fieldName: "id", direction: .ascending)
 
         genericDataAccess.fetchEntitiesPublisher(sort: s).sink { completion in
@@ -116,7 +114,7 @@ class FetchEntitiesPublisherTests: XCTestCase {
         }.store(in:&self.storage)
     }
 
-    func testFetchEntityRetuensCorrectResultWhenPassesfetchLimit() {
+    func testFetchModelsRetuensCorrectResultWhenPassesfetchLimit() {
         genericDataAccess.fetchEntitiesPublisher(fetchLimit: 5).sink { completion in
             switch completion {
             case .finished:
@@ -129,7 +127,7 @@ class FetchEntitiesPublisherTests: XCTestCase {
         }.store(in:&self.storage)
     }
 
-    func testFetchEntityRetuensCorrectResultWhenPassesfetchOfsset() {
+    func testFetchModelsRetuensCorrectResultWhenPassesfetchOfsset() {
         genericDataAccess.fetchEntitiesPublisher(fetchOffset: 10).sink { completion in
             switch completion {
             case .finished:
@@ -144,17 +142,28 @@ class FetchEntitiesPublisherTests: XCTestCase {
 
     class MockGenericDataAccess<TEntity>: GenericDataAccess<TEntity> where TEntity: EntityProtocol, TEntity: AnyObject, TEntity: NSFetchRequestResult {
 
+        private var entityToReturn: MockEntity? = nil
         var expectedBehavior: () throws -> Void = {}
 
         func set(expectedBehavior: @escaping () throws -> Void) {
             self.expectedBehavior = expectedBehavior
         }
 
+        func setEntity(_ entity: MockEntity) {
+            entityToReturn = entity
+        }
+
         override func fetchEntity(predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) throws -> [TEntity] {
 
             try expectedBehavior()
 
-            let entity = MockEntity()
+            let entity: MockEntity
+
+            if let entityToReturn = entityToReturn {
+                entity = entityToReturn
+            } else {
+                entity = MockEntity()
+            }
 
             if let _ = predicate {
                 entity.id = Helper.predicate.value
@@ -190,3 +199,5 @@ class FetchEntitiesPublisherTests: XCTestCase {
         }
     }
 }
+
+

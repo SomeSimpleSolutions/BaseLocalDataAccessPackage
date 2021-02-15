@@ -1,28 +1,27 @@
 //
-//  GenericDataAccessProtocol+FetchEntitiesPublisher.swift
+//  GenericDataAccess+FetchModelsPublisher.swift
 //  
 //
-//  Created by Hadi Zamani on 2/9/21.
+//  Created by Hadi Zamani on 2/14/21.
 //
 
 import Combine
 
 @available(iOS 13.0, *)
 public extension GenericDataAccess {
-
-    func fetchEntitiesPublisher(predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) -> FetchEntitiesPublisher {
+    func fetchModelsPublisher<TModel: ModelProtocol>(predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) -> FetchModelsPublisher<TModel> {
 
         let params: Params = (predicate: predicate, sort: sort, fetchLimit: fetchLimit, fetchOffset: fetchOffset)
 
-        return FetchEntitiesPublisher(self: self, params: params)
+        return FetchModelsPublisher(self: self, params: params)
     }
 
-    struct FetchEntitiesPublisher: Publisher {
+    struct FetchModelsPublisher<TModel: ModelProtocol>: Publisher {
         private let gda: GenericDataAccess<TEntity>
         private let params: Params
 
-        public typealias Output = [TEntity]
-        public typealias Failure = EntityCRUDError
+        public typealias Output = [TModel]
+        public typealias Failure = ModelError
 
         init(self gda: GenericDataAccess<TEntity>, params: Params) {
             self.gda = gda
@@ -53,14 +52,14 @@ public extension GenericDataAccess {
                 }
 
                 do {
-                    let result = try gda.fetchEntities(predicate: params.predicate, sort: params.sort, fetchLimit: params.fetchLimit, fetchOffset: params.fetchOffset)
+                    let result: [TModel] = try gda.fetchModels(predicate: params.predicate, sort: params.sort, fetchLimit: params.fetchLimit, fetchOffset: params.fetchOffset)
                     _ = downstream?.receive(result)
                     downstream?.receive(completion: .finished)
 
-                } catch EntityCRUDError.failFetchEntity(let error) {
-                    downstream?.receive(completion: .failure(EntityCRUDError.failFetchEntity(error)))
+                } catch ModelError.failCreateModel(let error) {
+                    downstream?.receive(completion: .failure(ModelError.failCreateModel(error)))
                 } catch {
-                    downstream?.receive(completion: .failure(EntityCRUDError.failFetchEntity(error.localizedDescription)))
+                    downstream?.receive(completion: .failure(ModelError.failCreateModel(error.localizedDescription)))
                 }
             }
 

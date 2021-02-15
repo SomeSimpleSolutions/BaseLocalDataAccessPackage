@@ -18,10 +18,14 @@ class MockManagedObjectContext: ManagedObjectContextProtocol {
 
 class MockEntity {
     var id: String = ""
+    var title: String = ""
+
+    public func toModel() throws -> ModelProtocol {
+        return MockModel(id: id, title: title)
+    }
 }
 
 extension MockEntity: EntityProtocol {
-    
     public static var idField: String {
         return "id"
     }
@@ -30,17 +34,15 @@ extension MockEntity: EntityProtocol {
         return "MockEntity"
     }
     
-    public func toModel() throws -> ModelProtocol {
-        return MockModel()
-    }
-    
     public enum Fields: String {
         case id
         case title
     }
-    
-    public struct MockModel: ModelProtocol {
-    }
+}
+
+public struct MockModel: ModelProtocol {
+    var id: String
+    var title: String
 }
 
 extension MockEntity: NSFetchRequestResult {
@@ -95,4 +97,11 @@ extension MockEntity: NSFetchRequestResult {
     var description: String {
         return ""
     }
+}
+
+class FailedToModelMockEntity: MockEntity {
+    override public func toModel() throws -> ModelProtocol {
+        throw ModelError.failCreateModel("MockModel")
+    }
+
 }
