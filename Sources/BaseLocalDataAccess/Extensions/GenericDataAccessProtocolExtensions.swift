@@ -52,7 +52,7 @@ public extension GenericDataAccessProtocol where T: EntityProtocol {
             throw ModelError.failCreateModel(model)
         }
         catch let error as NSError{
-            throw  DataAccessError.failFetchData(error.localizedDescription)
+            throw DataAccessError.failFetchData(error.localizedDescription)
         }
     }
     
