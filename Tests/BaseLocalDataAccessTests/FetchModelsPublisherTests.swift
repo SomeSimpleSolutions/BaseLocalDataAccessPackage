@@ -14,14 +14,11 @@ import CoreData
 class FetchModelsPublisherTests: XCTestCase {
     private var storage = Set<AnyCancellable>()
     private var genericDataAccess: MockGenericDataAccess<MockEntity>!
-    private var p: GenericDataAccess<MockEntity>.FetchModelsPublisher<MockModel>!
 
     override func setUp() {
         super.setUp()
 
         genericDataAccess = MockGenericDataAccess<MockEntity>(context: MockManagedObjectContext())
-
-        p = genericDataAccess.fetchModelsPublisher()
     }
 
     override func tearDown() {
@@ -31,7 +28,9 @@ class FetchModelsPublisherTests: XCTestCase {
     }
 
     func testFetchModelsIsSuccessful() {
-        p.sink { completion in
+        genericDataAccess
+            .fetchModelsPublisher(typeOfTheModel: MockModel.self)
+            .sink { completion in
             switch completion {
             case .finished:
                 break
@@ -48,7 +47,9 @@ class FetchModelsPublisherTests: XCTestCase {
             throw EntityCRUDError.failFetchEntity("Mock")
         }
 
-        p.sink { completion in
+        genericDataAccess
+            .fetchModelsPublisher(typeOfTheModel: MockModel.self)
+            .sink { completion in
             switch completion {
             case .finished:
                 XCTFail()
@@ -68,7 +69,9 @@ class FetchModelsPublisherTests: XCTestCase {
 
         genericDataAccess.setEntity(FailedToModelMockEntity())
 
-        p.sink { completion in
+        genericDataAccess
+            .fetchModelsPublisher(typeOfTheModel: MockModel.self)
+            .sink { completion in
             switch completion {
             case .finished:
                 XCTFail()
@@ -87,7 +90,9 @@ class FetchModelsPublisherTests: XCTestCase {
     func testFetchModelsRetuensCorrectResultWhenPassesPredicate() {
         let p = PredicateObject(fieldName: "Id", operatorName: .equal, value: "1")
 
-        genericDataAccess.fetchEntitiesPublisher(predicate: p).sink { completion in
+        genericDataAccess
+            .fetchModelsPublisher(typeOfTheModel: MockModel.self, predicate: p)
+            .sink { completion in
             switch completion {
             case .finished:
                 break
@@ -102,7 +107,9 @@ class FetchModelsPublisherTests: XCTestCase {
     func testFetchModelsRetuensCorrectResultWhenPassesSort() {
         let s = SortObject(fieldName: "id", direction: .ascending)
 
-        genericDataAccess.fetchEntitiesPublisher(sort: s).sink { completion in
+        genericDataAccess
+            .fetchModelsPublisher(typeOfTheModel: MockModel.self, sort: s)
+            .sink { completion in
             switch completion {
             case .finished:
                 break
@@ -115,7 +122,9 @@ class FetchModelsPublisherTests: XCTestCase {
     }
 
     func testFetchModelsRetuensCorrectResultWhenPassesfetchLimit() {
-        genericDataAccess.fetchEntitiesPublisher(fetchLimit: 5).sink { completion in
+        genericDataAccess
+            .fetchModelsPublisher(typeOfTheModel: MockModel.self, fetchLimit: 5)
+            .sink { completion in
             switch completion {
             case .finished:
                 break
@@ -128,7 +137,9 @@ class FetchModelsPublisherTests: XCTestCase {
     }
 
     func testFetchModelsRetuensCorrectResultWhenPassesfetchOfsset() {
-        genericDataAccess.fetchEntitiesPublisher(fetchOffset: 10).sink { completion in
+        genericDataAccess
+            .fetchModelsPublisher(typeOfTheModel: MockModel.self, fetchOffset: 10)
+            .sink { completion in
             switch completion {
             case .finished:
                 break

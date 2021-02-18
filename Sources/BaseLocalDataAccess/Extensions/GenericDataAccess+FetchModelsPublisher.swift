@@ -9,7 +9,7 @@ import Combine
 
 @available(iOS 13.0, *)
 public extension GenericDataAccess {
-    func fetchModelsPublisher<TModel: ModelProtocol>(predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) -> FetchModelsPublisher<TModel> {
+    func fetchModelsPublisher<TModel: ModelProtocol>(typeOfTheModel: TModel.Type, predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) -> FetchModelsPublisher<TModel> {
 
         let params: Params = (predicate: predicate, sort: sort, fetchLimit: fetchLimit, fetchOffset: fetchOffset)
 
