@@ -9,6 +9,12 @@ import Combine
 
 @available(iOS 13.0, *)
 public extension GenericDataAccess {
+    /**
+        Fetch entities, convert them to models, then publish the models.
+     
+        The typeOfTheModel is the type of the model which conforms to the `ModelProtocol`. This is needed to prevent the `Generic parameter 'TModel' could not be inferred` error and avoid explicitly specify the return type of `fetchModelsPublisher`. The sample argument would be `MockModel.self` which `struct MockModel: ModelProtocol { ... }`. It is the same model returned by the `toModel` func in `EntityProtocol`.
+     */
+    
     func fetchModelsPublisher<TModel: ModelProtocol>(typeOfTheModel: TModel.Type, predicate: PredicateProtocol? = nil, sort: SortProtocol? = nil, fetchLimit: Int? = nil, fetchOffset: Int? = nil) -> FetchModelsPublisher<TModel> {
 
         let params: Params = (predicate: predicate, sort: sort, fetchLimit: fetchLimit, fetchOffset: fetchOffset)
